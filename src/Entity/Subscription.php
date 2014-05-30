@@ -11,6 +11,14 @@ class Subscription
     protected $unsubscribeDate = 0;
     protected $subscribeDate = 0;
 
+    public function subscribed()
+    {
+        if ($this->subscribeDate > $this->unsubscribeDate) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @return id
      */

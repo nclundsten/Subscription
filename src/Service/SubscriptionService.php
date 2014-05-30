@@ -38,6 +38,7 @@ class SubscriptionService implements SubscriptionInterface, ServiceLocatorAwareI
     {
         $record = $this->getRecord($email, $typeEnum, $typeId, true);
         $record->setSubscribeDate(time());
+
         $this->getMapper()->persist($record);
     }
 
@@ -51,6 +52,38 @@ class SubscriptionService implements SubscriptionInterface, ServiceLocatorAwareI
             $record->setTypeId($typeId);
         }
         return $record;
+    }
+
+    public function getRecordsByEmail($email, $subscribed=null)
+    {
+        return $this->getMapper()->getRecordsByEmail($email, $subscribed);
+    }
+
+    public function getRecordsByTypeEnum($typeEnum, $email=null, $subscribed=null)
+    {
+        return $this->getMapper()->getRecordsByTypeEnum($typeEnum, $email, $subscribed);
+    }
+
+    public function getRecordsByTypeId($typeEnum=0, $typeId=0, $subscribed=null)
+    {
+        return $this->getMapper()->getRecordsByTypeId($typeEnum, $typeId, $subscribed);
+    }
+
+    public function persistSubscriptions($email, array $subscriptionArray)
+    {
+        foreach ($subscriptionArray as $subscription) {
+            $typeEnum = isset($subscription['type_enum'])
+                ? $subscription['type_enum']
+                : 0;
+            $typeId = isset($subscription['type_id'])
+                ? $subscription['type_id']
+                : 0;
+            if ($subscription['subscribed']) {
+                $this->subscribe($email, $typeEnum, $typeId);
+            } else {
+                $this->unsubscribe($email, $typeEnum, $typeId);
+            }
+        }
     }
 
     public function canEmail($email, $typeEnum=0, $typeId=0, $default=null)
