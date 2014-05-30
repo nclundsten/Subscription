@@ -1,0 +1,16 @@
+<?php
+return array(
+    'subscription' => array(
+        // put a unique salt string here, to be used when hashing emails for external links.
+        'hash_salt'         => '',
+
+        // when calling canEmail() on the subscription service,
+        // this is the response it will return when no record is found
+        'can_email_default' => true,
+    ),
+    'service_manager' => array(
+        'aliases' => array(
+            'subscription_db_adapter' => 'Zend\Db\Adapter\Adapter'
+        ),
+    ),
+);
