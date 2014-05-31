@@ -54,6 +54,11 @@ class SubscriptionService implements SubscriptionInterface, ServiceLocatorAwareI
         return $record;
     }
 
+    public function getRecordById($id)
+    {
+        return $this->getMapper()->getRecordById($id);
+    }
+
     public function getRecordsByEmail($email, $subscribed=null)
     {
         return $this->getMapper()->getRecordsByEmail($email, $subscribed);

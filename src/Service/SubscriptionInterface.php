@@ -11,6 +11,8 @@ interface SubscriptionInterface
     public function canEmail($email, $typeEnum=0, $typeId=0);
     //get records for a specific type enum and identifier for single email
     public function getRecord($email, $typeEnum=0, $typeId=0, $new=false);
+    //get by id
+    public function getRecordById($id);
     //get all records for a specific email address, optionally get subscribed/unsubscribed only
     public function getRecordsByEmail($email, $subscribed=null);
     //get all records for a specific type enum, optional email, optionally get subscribed/unsubscribed only

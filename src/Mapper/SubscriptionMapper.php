@@ -29,6 +29,24 @@ class SubscriptionMapper extends AbstractDbMapper
         return false;
     }
 
+    public function getRecordById($id)
+    {
+        $select = $this->getSelect();
+
+        $where = new Sql\Where();
+        $where->equalTo('id', $id);
+        $select->limit(1);
+        $select->where($where);
+
+        $result = $this->select($select);
+
+        if (count($result)) {
+            return $result->current();
+        }
+
+        return false;
+    }
+
     public function getRecordsByEmail($email, $subscribed=null)
     {
         $select = $this->getSelect();

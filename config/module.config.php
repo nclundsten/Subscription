@@ -5,12 +5,35 @@
     'router' => array(
         'routes' => array(
             'subscription' => array(
-                'type' => 'segment',
+                'type' => 'literal',
                 'options' => array(
-                    'route' => '/subscription[/:hashedEmail]', //requires hashed email if visiting from link (without being logged in)
+                    'route' => '/subscription',
                     'defaults' => array(
                         'controller' => 'subscription',
                         'action'     => 'index',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'external' => array(
+                        'type' => 'segment',
+                        'options' => array(
+                            'route' => '/:hashedEmail',
+                            'defaults' => array(
+                                'controller' => 'subscription',
+                                'action'     => 'index',
+                            ),
+                        ),
+                    ),
+                    'subscription' => array(
+                        'type' => 'segment',
+                        'options' => array(
+                            'route' => '/:subscriptionId/:hashedEmail',
+                            'defaults' => array(
+                                'controller' => 'subscription',
+                                'action'     => 'subscription',
+                            ),
+                        ),
                     ),
                 ),
             ),

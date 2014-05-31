@@ -13,51 +13,32 @@ class SubscriptionController extends AbstractActionController
 
     public function indexAction()
     {
-
-        $prg = $_POST;
         //TODO: prg
-        //$prg = $this->getParams()->fromPost();
+        $prg = $_POST;
+        $prg = array_merge($prg, $_GET);
 
-        //$prg = array(
-        //    //'email' => 'nigel.lundsten@gmail.com',
-        //    'subscriptions' => array(
-        //        array(
-        //            'type_enum' => 1,
-        //            'type_id' => 2,
-        //            'subscribed' => true
-        //        ),
-        //        array(
-        //            'type_enum' => 2,
-        //            'type_id' => 1,
-        //            'subscribed' => false
-        //        ),
-        //    ),
-        //);
-        //
-        //$prg = array();
+        $email = isset($prg['email']) ? $prg['email'] : false;
+        $hashedEmail = $this->params('hashedEmail') ?: false;
 
-        if ($this->params('hashedEmail') && !isset($prg['email'])) {
-            $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
-            $this->redirect()->toRoute('home');
-        }
 
-        if ($this->params('hashedEmail') && isset($prg['email'])) {
-            $hash = $this->params('hashedEmail');
-            $email = $prg['email'];
-            if (!$this->getSubscriptionService()->validateKey($email, $hash)) {
+        if ($hashedEmail) {
+            if (!$email) {
                 $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
-                $this->redirect()->toRoute('home');
+                return $this->redirect()->toRoute('home');
             }
-        } elseif($this->getZfcUserService()->getIdentity() == false) {
+
+            if (!$this->getSubscriptionService()->validateKey($email, $hashedEmail)) {
+                $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
+                return $this->redirect()->toRoute('home');
+            }
+            $url = $this->url()->fromRoute('subscription/external', ['hashedEmail' => $hashedEmail]) . '?email=' . $email;
+        } elseif ($this->getZfcUserService()->getIdentity() == false) {
             $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
-            $this->redirect()->toRoute('home');
+            return $this->redirect()->toRoute('home');
         }
 
         //all good, let er rip
-
-        if (!isset($email)) {
-            $email = $this->getZfcUserService()->getIdentity()->getEmail();
-        };
+        $email = ($email) ?: $this->getZfcUserService()->getIdentity()->getEmail();
 
         if (isset($prg['subscriptions']) && is_array($prg['subscriptions'])) {
             $this->getSubscriptionService()
@@ -65,12 +46,44 @@ class SubscriptionController extends AbstractActionController
             $this->flashMessenger()->addSuccessMessage('Subscription preferences saved.');
         }
 
+
         $subscriptions = $this->getSubscriptionService()
             ->getRecordsByEmail($email);
-        error_reporting(1);
         return new ViewModel(array(
             'subscriptions' => $subscriptions,
             'email'         => $email,
+            'url'           => ($url) ?: '/subscription',
+        ));
+    }
+
+
+    public function subscriptionAction()
+    {
+        //TODO: prg
+        $prg = $_POST;
+        $prg = array_merge($prg, $_GET);
+
+        $subscriptionId = $this->params('subscriptionId') ?: false;
+        $hashedEmail    = $this->params('hashedEmail') ?: false;
+        $email = isset($prg['email']) ? $prg['email'] : false;
+
+        if (!$subscriptionId || !$hashedEmail || !$email) {
+            $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
+            return $this->redirect()->toRoute('home');
+        }
+
+        if (!$this->getSubscriptionService()->validateKey($email, $hashedEmail)) {
+            $this->flashMessenger()->addErrorMessage('There was an error processing your request.');
+            return $this->redirect()->toRoute('home');
+        }
+
+        $url = $this->url()->fromRoute('subscription/external', ['hashedEmail' => $hashedEmail]) . '?email=' . $email;
+        $subscription = $this->getSubscriptionService()
+            ->getRecordById($subscriptionId);
+        return new ViewModel(array(
+            'subscription' => $subscription,
+            'email'        => $email,
+            'url'          => $url,
         ));
     }
 
