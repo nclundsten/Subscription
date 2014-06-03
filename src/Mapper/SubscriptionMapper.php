@@ -129,4 +129,9 @@ class SubscriptionMapper extends AbstractDbMapper
         }
         return $this->insert($subscription);
     }
+
+    public function getEntityPrototype()
+    {
+        return new EntityPrototype;
+    }
 }

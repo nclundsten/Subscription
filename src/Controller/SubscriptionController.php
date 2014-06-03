@@ -56,7 +56,6 @@ class SubscriptionController extends AbstractActionController
         ));
     }
 
-
     public function subscriptionAction()
     {
         //TODO: prg
